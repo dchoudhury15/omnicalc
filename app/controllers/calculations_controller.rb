@@ -9,15 +9,18 @@ class CalculationsController < ApplicationController
     # The text the user input is in the string @text.
     # The special word the user input is in the string @special_word.
     # ================================================================================
+    special_word_string=@special_word.gsub(" ","").downcase
 
+    text_edit=@text.gsub("\n"," ").gsub("\r","").gsub("\t","")
 
-    @character_count_with_spaces = "Replace this string with your answer."
+    @character_count_with_spaces = text_edit.length
 
-    @character_count_without_spaces = "Replace this string with your answer."
+    @character_count_without_spaces = text_edit.gsub(" ", "").length
 
-    @word_count = "Replace this string with your answer."
+    @word_count = text_edit.split.length
 
-    @occurrences = "Replace this string with your answer."
+    @occurrences = @text.gsub(/[^a-z0-9 ]/i,"").downcase.split.count special_word_string
+
 
     # ================================================================================
     # Your code goes above.
@@ -30,6 +33,9 @@ class CalculationsController < ApplicationController
     @apr = params[:annual_percentage_rate].to_f
     @years = params[:number_of_years].to_i
     @principal = params[:principal_value].to_f
+    monthly_apr=@apr/12/100
+    period=@years*12
+
 
     # ================================================================================
     # Your code goes below.
@@ -38,7 +44,7 @@ class CalculationsController < ApplicationController
     # The principal value the user input is in the decimal @principal.
     # ================================================================================
 
-    @monthly_payment = "Replace this string with your answer."
+    @monthly_payment = @principal*((((1+monthly_apr)**period))*monthly_apr)/((1+monthly_apr)**period-1)
 
     # ================================================================================
     # Your code goes above.
@@ -59,13 +65,14 @@ class CalculationsController < ApplicationController
     #   So if you subtract one time from another, you will get an integer
     #   number of seconds as a result.
     # ================================================================================
+    time_elapsed=(@ending-@starting).abs
 
-    @seconds = "Replace this string with your answer."
-    @minutes = "Replace this string with your answer."
-    @hours = "Replace this string with your answer."
-    @days = "Replace this string with your answer."
-    @weeks = "Replace this string with your answer."
-    @years = "Replace this string with your answer."
+    @seconds = time_elapsed
+    @minutes = time_elapsed/60
+    @hours = time_elapsed/60/60
+    @days = time_elapsed/60/60/24
+    @weeks = time_elapsed/60/60/24/7
+    @years = time_elapsed/60/60/24/7/52
 
     # ================================================================================
     # Your code goes above.
@@ -80,29 +87,46 @@ class CalculationsController < ApplicationController
     # ================================================================================
     # Your code goes below.
     # The numbers the user input are in the array @numbers.
-    # ================================================================================
+    # ============================================================================
 
-    @sorted_numbers = "Replace this string with your answer."
+    @sorted_numbers = @numbers.sort
 
-    @count = "Replace this string with your answer."
+    @count = @numbers.count
 
-    @minimum = "Replace this string with your answer."
+    @minimum = @numbers.min
 
-    @maximum = "Replace this string with your answer."
+    @maximum = @numbers.max
 
-    @range = "Replace this string with your answer."
+    @range = @numbers.max-@numbers.min
 
-    @median = "Replace this string with your answer."
+    if @count % 2 != 0
+      index_median=(@sorted_numbers.length + 1) / 2.0
+      median=@sorted_numbers[index_median-1]
+    else
+      index_median=(@sorted_numbers.length) / 2.0
+      median=((@sorted_numbers[index_median-1]+@sorted_numbers[index_median]) / 2.0)
+      # index_median=((@numbers.length/2.0) + ((@numbers.length + 2)/2.0) / 2.0)
+    end
 
-    @sum = "Replace this string with your answer."
+    @median =median
 
-    @mean = "Replace this string with your answer."
+    @sum = @numbers.inject(0, :+)
 
-    @variance = "Replace this string with your answer."
+    @mean = @sum/@count
 
-    @standard_deviation = "Replace this string with your answer."
+    intermediate=@numbers.map { |i| i - @mean }
+    intermediate2=intermediate.map { |e| e**2  }
 
-    @mode = "Replace this string with your answer."
+    @variance = intermediate2.inject(0,:+)/@count
+
+    @standard_deviation = @variance**(0.5)
+    # counts=Hash.new(0)
+    freq = @numbers.inject(Hash.new(0)) { |h,v| h[v] += 1; h }
+    # @numbers.each do |nummm|
+    #   nummm +=1
+    # end
+
+    @mode = @numbers.max_by { |v| freq[v] }
 
     # ================================================================================
     # Your code goes above.
